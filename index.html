@@ -1,1 +1,153 @@
 
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Avaliações NTE 14</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f1f5f9;
+      color: #172554;
+    }
+    header {
+      background: #123b70;
+      color: white;
+      padding: 24px 16px;
+      text-align: center;
+    }
+    main {
+      max-width: 600px;
+      margin: 20px auto;
+      padding: 16px;
+    }
+    .card {
+      background: white;
+      padding: 20px;
+      margin-bottom: 16px;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px #0001;
+    }
+    input, select, button {
+      width: 100%;
+      padding: 12px;
+      margin-top: 10px;
+      border-radius: 7px;
+      font-size: 16px;
+    }
+    input, select { border: 1px solid #cbd5e1; }
+    button {
+      background: #1764aa;
+      color: white;
+      border: none;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    .aviso { color: #64748b; font-size: 13px; }
+    #painel { display: none; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Avaliações NTE 14</h1>
+    <p>Portal escolar de avaliações</p>
+  </header>
+
+  <main>
+    <section class="card" id="login">
+      <h2>Acesso ao portal</h2>
+      <label for="perfil">Selecione seu perfil</label>
+      <select id="perfil">
+        <option value="aluno">Aluno</option>
+        <option value="professor">Professor</option>
+      </select>
+      <label for="matricula">Matrícula</label>
+      <input id="matricula" placeholder="Digite sua matrícula">
+      <label for="senha">Senha</label>
+      <input id="senha" type="password" placeholder="Digite sua senha">
+      <button onclick="entrar()">Entrar</button>
+      <p class="aviso">Protótipo demonstrativo. O acesso ainda não está conectado a um sistema seguro de contas.</p>
+      <p id="mensagem"></p>
+    </section>
+
+    <section class="card" id="painel">
+      <h2 id="boasVindas">Painel</h2>
+      <div id="areaProfessor" style="display:none">
+        <h3>Cadastrar avaliação</h3>
+        <input id="disciplina" placeholder="Disciplina">
+        <input id="turma" placeholder="Turma">
+        <input id="titulo" placeholder="Nome da avaliação">
+        <input id="data" type="date">
+        <button onclick="salvarAvaliacao()">Salvar avaliação neste aparelho</button>
+      </div>
+      <h3>Avaliações cadastradas</h3>
+      <div id="lista">Nenhuma avaliação cadastrada.</div>
+      <button onclick="sair()">Sair</button>
+    </section>
+  </main>
+
+  <script>
+    function entrar() {
+      const perfil = document.getElementById('perfil').value;
+      const matricula = document.getElementById('matricula').value.trim();
+      const senha = document.getElementById('senha').value;
+      if (!matricula || !senha) {
+        document.getElementById('mensagem').textContent =
+          'Preencha a matrícula e a senha.';
+        return;
+      }
+      document.getElementById('login').style.display = 'none';
+      document.getElementById('painel').style.display = 'block';
+      document.getElementById('boasVindas').textContent =
+        perfil === 'professor' ? 'Painel do professor' : 'Painel do aluno';
+      document.getElementById('areaProfessor').style.display =
+        perfil === 'professor' ? 'block' : 'none';
+      listarAvaliacoes();
+    }
+
+    function salvarAvaliacao() {
+      const avaliacao = {
+        disciplina: document.getElementById('disciplina').value.trim(),
+        turma: document.getElementById('turma').value.trim(),
+        titulo: document.getElementById('titulo').value.trim(),
+        data: document.getElementById('data').value
+      };
+      if (!avaliacao.disciplina || !avaliacao.titulo) {
+        alert('Preencha a disciplina e o nome da avaliação.');
+        return;
+      }
+      const lista = JSON.parse(localStorage.getItem('avaliacoesNTE14') || '[]');
+      lista.push(avaliacao);
+      localStorage.setItem('avaliacoesNTE14', JSON.stringify(lista));
+      listarAvaliacoes();
+      alert('Avaliação salva neste aparelho.');
+    }
+
+    function listarAvaliacoes() {
+      const lista = JSON.parse(localStorage.getItem('avaliacoesNTE14') || '[]');
+      const area = document.getElementById('lista');
+      area.innerHTML = '';
+      if (!lista.length) {
+        area.textContent = 'Nenhuma avaliação cadastrada.';
+        return;
+      }
+      lista.forEach(a => {
+        const item = document.createElement('p');
+        item.textContent = a.titulo + ' — ' + a.disciplina +
+          ' — Turma: ' + a.turma + ' — Data: ' + a.data;
+        area.appendChild(item);
+      });
+    }
+
+    function sair() {
+      document.getElementById('painel').style.display = 'none';
+      document.getElementById('login').style.display = 'block';
+      document.getElementById('senha').value = '';
+    }
+  </script>
+</body>
+</html>
+
